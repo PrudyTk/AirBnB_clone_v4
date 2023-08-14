@@ -45,5 +45,5 @@ class TestAmenity(unittest.TestCase):
         with self.subTest(msg='Attributes'):
             self.assertIsInstance(Amenity.name, str)
 
-if __name__ == '__main__':
-    unittest.main()
+            if __name__ == '__main__':
+                unittest.main()

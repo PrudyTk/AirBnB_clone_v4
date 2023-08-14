@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """file_storage.py module"""
 import json
+import os
 from models.base_model import BaseModel
 from models.user import User
 from models.amenity import Amenity
@@ -10,60 +11,53 @@ from models.review import Review
 from models.state import State
 
 
-class FileStorage():
-    """
-    FileStorage class:
-    ------------------
-    """
+class FileStorage:
+    """ doc doc """
+
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """
-        public instance method that returns the
-        dictionary __objects.
-        """
+        """ doc doc """
         return FileStorage.__objects
 
     def new(self, obj):
-        """
-        public instance method that sets in __objects
-        the obj with key <obj class name>.id
-        Variables:
-        ----------
-        key [str] -- key format generated.
-        """
-        if obj:
-            key = "{}.{}".format(obj.__class__.__name__, obj.id)
-            FileStorage.__objects[key] = obj
+        """ doc doc """
+        id = obj.to_dict()["id"]
+        className = obj.to_dict()["__class__"]
+        keyName = className+"."+id
+        FileStorage.__objects[keyName] = obj
 
     def save(self):
-        """
-        public instance method that serializes __objects
-        to the JSON file (path: __file_path).
-        Variables:
-        ----------
-        new_dict [dict] -- keys and values to build JSON.
-        """
-        new_dict = {}
-        for key, value in FileStorage.__objects.items():
-            new_dict[key] = value.to_dict().copy()
-        with open(FileStorage.__file_path, mode='w') as my_file:
-            json.dump(new_dict, my_file)
+        """ doc doc """
+        filepath = FileStorage.__file_path
+        data = dict(FileStorage.__objects)
+        for key, value in data.items():
+            data[key] = value.to_dict()
+        with open(filepath, 'w') as f:
+            json.dump(data, f)
 
     def reload(self):
-        """
-        public instance method that deserializes a JSON
-        file to __objects.
-        """
-        try:
-            with open(FileStorage.__file_path, mode='r') as my_file:
-                new_dict = json.load(my_file)
-
-            for key, value in new_dict.items():
-                class_name = value.get('__class__')
-                obj = eval(class_name + '(**value)')
-                FileStorage.__objects[key] = obj
-
-        except FileNotFoundError:
-            pass
+        """ doc doc """
+        filepath = FileStorage.__file_path
+        data = FileStorage.__objects
+        if os.path.exists(filepath):
+            try:
+                with open(filepath) as f:
+                    for key, value in json.load(f).items():
+                        if "BaseModel" in key:
+                            data[key] = BaseModel(**value)
+                        if "User" in key:
+                            data[key] = User(**value)
+                        if "Place" in key:
+                            data[key] = Place(**value)
+                        if "State" in key:
+                            data[key] = State(**value)
+                        if "City" in key:
+                            data[key] = City(**value)
+                        if "Amenity" in key:
+                            data[key] = Amenity(**value)
+                        if "Review" in key:
+                            data[key] = Review(**value)
+            except Exception:
+                pass

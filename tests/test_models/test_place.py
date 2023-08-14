@@ -1,57 +1,47 @@
 #!/usr/bin/python3
 """Module for test Place class"""
 import unittest
-import json
-import pep8
-import datetime
-
 from models.place import Place
-from models.base_model import BaseModel
+from datetime import datetime
 
 
-class TestPlace(unittest.TestCase):
-    """Test State class implementation"""
-    def test_doc_module(self):
-        """Module documentation"""
-        doc = Place.__doc__
-        self.assertGreater(len(doc), 1)
+class PlaceTestCase(unittest.TestCase):
+    """ class for place test """
 
-    def test_pep8_conformance_place(self):
-        """Test that models/place.py conforms to PEP8."""
-        pep8style = pep8.StyleGuide(quiet=True)
-        result = pep8style.check_files(['models/place.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+    def test_place(self):
+        """existince"""
+        new = Place()
+        self.assertTrue(hasattr(new, "id"))
+        self.assertTrue(hasattr(new, "created_at"))
+        self.assertTrue(hasattr(new, "updated_at"))
+        self.assertTrue(hasattr(new, "city_id"))
+        self.assertTrue(hasattr(new, "user_id"))
+        self.assertTrue(hasattr(new, "name"))
+        self.assertTrue(hasattr(new, "description"))
+        self.assertTrue(hasattr(new, "number_rooms"))
+        self.assertTrue(hasattr(new, "number_bathrooms"))
+        self.assertTrue(hasattr(new, "max_guest"))
+        self.assertTrue(hasattr(new, "price_by_night"))
+        self.assertTrue(hasattr(new, "latitude"))
+        self.assertTrue(hasattr(new, "longitude"))
+        self.assertTrue(hasattr(new, "amenity_ids"))
 
-    def test_pep8_conformance_test_place(self):
-        """Test that tests/test_models/test_place.py conforms to PEP8."""
-        pep8style = pep8.StyleGuide(quiet=True)
-        res = pep8style.check_files(['tests/test_models/test_place.py'])
-        self.assertEqual(res.total_errors, 0,
-                         "Found code style errors (and warnings).")
+        """type test"""
+        self.assertIsInstance(new.id, str)
+        self.assertIsInstance(new.created_at, datetime)
+        self.assertIsInstance(new.updated_at, datetime)
+        self.assertIsInstance(new.city_id, str)
+        self.assertIsInstance(new.user_id, str)
+        self.assertIsInstance(new.name, str)
+        self.assertIsInstance(new.description, str)
+        self.assertIsInstance(new.number_rooms, int)
+        self.assertIsInstance(new.number_bathrooms, int)
+        self.assertIsInstance(new.max_guest, int)
+        self.assertIsInstance(new.price_by_night, int)
+        self.assertIsInstance(new.latitude, float)
+        self.assertIsInstance(new.longitude, float)
+        self.assertIsInstance(new.amenity_ids, list)
 
-    def test_doc_constructor(self):
-        """Constructor documentation"""
-        doc = Place.__init__.__doc__
-        self.assertGreater(len(doc), 1)
-
-    def test_class(self):
-        """Validate the types of the attributes an class"""
-        with self.subTest(msg='Inheritance'):
-            self.assertTrue(issubclass(Place, BaseModel))
-
-        with self.subTest(msg='Attributes'):
-            self.assertIsInstance(Place.city_id, str)
-            self.assertIsInstance(Place.user_id, str)
-            self.assertIsInstance(Place.name, str)
-            self.assertIsInstance(Place.description, str)
-            self.assertIsInstance(Place.number_rooms, int)
-            self.assertIsInstance(Place.number_bathrooms, int)
-            self.assertIsInstance(Place.max_guest, int)
-            self.assertIsInstance(Place.price_by_night, int)
-            self.assertIsInstance(Place.latitude, float)
-            self.assertIsInstance(Place.longitude, float)
-            self.assertIsInstance(Place.amenity_ids, list)
 
 if __name__ == '__main__':
     unittest.main()

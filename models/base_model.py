@@ -9,37 +9,38 @@ import models
 
 class BaseModel():
     '''class BaseModel'''
-    def __init__(self, *args, **kwargs):
-        '''class constructor for class BaseModel'''
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialization of BaseModel Class"""
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
         if kwargs:
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-
             for key, value in kwargs.items():
-                if key != '__class__':
-                    setattr(self, key, value)
+                if key in ["created_at", "updated_at"]:
+                    self.__dict__[key] = datetime.strptime(
+                        value, "%Y-%m-%dT%H:%M:%S.%f")
+                elif key != "__class__":
+                    self.__dict__[key] = value
         else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
             models.storage.new(self)
 
-    def __str__(self):
-        '''string of BaseModel instance'''
-        return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, self.__dict__)
+    def __str__(self) -> str:
+        """Returns the string representation of an instance"""
+        return "[{}] ({}) {}".format(
+            self.__class__.__name__, self.id, self.__dict__)
 
-    def save(self):
-        '''updates 'updated_at' instance with current datetime'''
+    def save(self) -> None:
+        """update the public instance updated_at"""
         self.updated_at = datetime.now()
         models.storage.save()
 
-    def to_dict(self):
-        '''dictionary representation of instance'''
-        new_dict = dict(self.__dict__)
-        new_dict['created_at'] = self.__dict__['created_at'].isoformat()
-        new_dict['updated_at'] = self.__dict__['updated_at'].isoformat()
-        new_dict['__class__'] = self.__class__.__name__
-        return (new_dict)
+    def to_dict(self) -> dict:
+        """returns the dictionary
+        representation of the instance"""
+        todict = dict(self.__dict__)
+        todict["__class__"] = self.__class__.__name__
+        if not isinstance(todict["created_at"], str):
+            todict["created_at"] = todict["created_at"].isoformat()
+        if not isinstance(todict["updated_at"], str):
+            todict["updated_at"] = todict["updated_at"].isoformat()
+        return todict

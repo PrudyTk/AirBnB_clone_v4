@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-"""Test for the console"""
-
 import unittest
 
 from unittest.mock import patch

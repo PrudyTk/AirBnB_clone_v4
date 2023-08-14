@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Module for test Review class"""
+
 import unittest
 import json
 import pep8
@@ -11,6 +12,7 @@ from models.base_model import BaseModel
 
 class TestReview(unittest.TestCase):
     """Test Review class implementation"""
+
     def test_doc_module(self):
         """Module documentation"""
         doc = Review.__doc__

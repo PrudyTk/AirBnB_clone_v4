@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Module for test User class"""
+
 import unittest
 import json
 import pep8
@@ -11,6 +12,7 @@ from models.base_model import BaseModel
 
 class TestUser(unittest.TestCase):
     """Test User class implementation"""
+
     def test_doc_module(self):
         """Module documentation"""
         doc = User.__doc__

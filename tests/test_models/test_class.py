@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Module for test classes"""
+
 import inspect
 import pep8
 

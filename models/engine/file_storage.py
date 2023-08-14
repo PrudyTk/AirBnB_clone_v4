@@ -1,51 +1,69 @@
 #!/usr/bin/python3
-"""Defines the BaseModel class."""
-import models
-from uuid import uuid4
-from datetime import datetime
+"""file_storage.py module"""
+import json
+from models.base_model import BaseModel
+from models.user import User
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
 
 
-class BaseModel:
-    """Represents the BaseModel of the HBnB project."""
+class FileStorage():
+    """
+    FileStorage class:
+    ------------------
+    """
+    __file_path = "file.json"
+    __objects = {}
 
-    def __init__(self, *args, **kwargs):
-        """Initialize a new BaseModel.
-
-        Args:
-            *args (any): Unused.
-            **kwargs (dict): Key/value pairs of attributes.
+    def all(self):
         """
-        tform = "%Y-%m-%dT%H:%M:%S.%f"
-        self.id = str(uuid4())
-        self.created_at = datetime.today()
-        self.updated_at = datetime.today()
-        if len(kwargs) != 0:
-            for k, v in kwargs.items():
-                if k == "created_at" or k == "updated_at":
-                    self.__dict__[k] = datetime.strptime(v, tform)
-                else:
-                    self.__dict__[k] = v
-        else:
-            models.storage.new(self)
+        public instance method that returns the
+        dictionary __objects.
+        """
+        return FileStorage.__objects
+
+    def new(self, obj):
+        """
+        public instance method that sets in __objects
+        the obj with key <obj class name>.id
+        Variables:
+        ----------
+        key [str] -- key format generated.
+        """
+        if obj:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            FileStorage.__objects[key] = obj
 
     def save(self):
-        """Update updated_at with the current datetime."""
-        self.updated_at = datetime.today()
-        models.storage.save()
-
-    def to_dict(self):
-        """Return the dictionary of the BaseModel instance.
-
-        Includes the key/value pair __class__ representing
-        the class name of the object.
         """
-        rdict = self.__dict__.copy()
-        rdict["created_at"] = self.created_at.isoformat()
-        rdict["updated_at"] = self.updated_at.isoformat()
-        rdict["__class__"] = self.__class__.__name__
-        return rdict
+        public instance method that serializes __objects
+        to the JSON file (path: __file_path).
+        Variables:
+        ----------
+        new_dict [dict] -- keys and values to build JSON.
+        """
+        new_dict = {}
+        for key, value in FileStorage.__objects.items():
+            new_dict[key] = value.to_dict().copy()
+        with open(FileStorage.__file_path, mode='w') as my_file:
+            json.dump(new_dict, my_file)
 
-    def __str__(self):
-        """Return the print/str representation of the BaseModel instance."""
-        clname = self.__class__.__name__
-        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
+    def reload(self):
+        """
+        public instance method that deserializes a JSON
+        file to __objects.
+        """
+        try:
+            with open(FileStorage.__file_path, mode='r') as my_file:
+                new_dict = json.load(my_file)
+
+            for key, value in new_dict.items():
+                class_name = value.get('__class__')
+                obj = eval(class_name + '(**value)')
+                FileStorage.__objects[key] = obj
+
+        except FileNotFoundError:
+            pass

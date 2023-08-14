@@ -1,63 +1,51 @@
 #!/usr/bin/python3
-"""file_storage.py module"""
-import json
-import os
-from models.base_model import BaseModel
-from models.user import User
-from models.amenity import Amenity
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
+"""Defines the BaseModel class."""
+import models
+from uuid import uuid4
+from datetime import datetime
 
 
-class FileStorage:
-    """ doc doc """
+class BaseModel:
+    """Represents the BaseModel of the HBnB project."""
 
-    __file_path = "file.json"
-    __objects = {}
+    def __init__(self, *args, **kwargs):
+        """Initialize a new BaseModel.
 
-    def all(self):
-        """ doc doc """
-        return FileStorage.__objects
-
-    def new(self, obj):
-        """ doc doc """
-        id = obj.to_dict()["id"]
-        className = obj.to_dict()["__class__"]
-        keyName = className+"."+id
-        FileStorage.__objects[keyName] = obj
+        Args:
+            *args (any): Unused.
+            **kwargs (dict): Key/value pairs of attributes.
+        """
+        tform = "%Y-%m-%dT%H:%M:%S.%f"
+        self.id = str(uuid4())
+        self.created_at = datetime.today()
+        self.updated_at = datetime.today()
+        if len(kwargs) != 0:
+            for k, v in kwargs.items():
+                if k == "created_at" or k == "updated_at":
+                    self.__dict__[k] = datetime.strptime(v, tform)
+                else:
+                    self.__dict__[k] = v
+        else:
+            models.storage.new(self)
 
     def save(self):
-        """ doc doc """
-        filepath = FileStorage.__file_path
-        data = dict(FileStorage.__objects)
-        for key, value in data.items():
-            data[key] = value.to_dict()
-        with open(filepath, 'w') as f:
-            json.dump(data, f)
+        """Update updated_at with the current datetime."""
+        self.updated_at = datetime.today()
+        models.storage.save()
 
-    def reload(self):
-        """ doc doc """
-        filepath = FileStorage.__file_path
-        data = FileStorage.__objects
-        if os.path.exists(filepath):
-            try:
-                with open(filepath) as f:
-                    for key, value in json.load(f).items():
-                        if "BaseModel" in key:
-                            data[key] = BaseModel(**value)
-                        if "User" in key:
-                            data[key] = User(**value)
-                        if "Place" in key:
-                            data[key] = Place(**value)
-                        if "State" in key:
-                            data[key] = State(**value)
-                        if "City" in key:
-                            data[key] = City(**value)
-                        if "Amenity" in key:
-                            data[key] = Amenity(**value)
-                        if "Review" in key:
-                            data[key] = Review(**value)
-            except Exception:
-                pass
+    def to_dict(self):
+        """Return the dictionary of the BaseModel instance.
+
+        Includes the key/value pair __class__ representing
+        the class name of the object.
+        """
+        rdict = self.__dict__.copy()
+        rdict["created_at"] = self.created_at.isoformat()
+        rdict["updated_at"] = self.updated_at.isoformat()
+        rdict["__class__"] = self.__class__.__name__
+        return rdict
+
+    def __str__(self):
+        """Return the print/str representation of the BaseModel instance."""
+        clname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)
